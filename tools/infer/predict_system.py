@@ -13,7 +13,7 @@
 # limitations under the License.
 import os
 import sys
-
+from sort_text import Word_Data, sort_text
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../..')))
@@ -138,6 +138,8 @@ def main(args):
         img, flag = check_and_read_gif(image_file)
         if not flag:
             img = cv2.imread(image_file)
+            height = img.shape[0]
+            width = img.shape[1]
         if img is None:
             logger.info("error in loading image:{}".format(image_file))
             continue
@@ -148,11 +150,20 @@ def main(args):
 
         drop_score = 0.5
         dt_num = len(dt_boxes)
+        words_list = []
         for dno in range(dt_num):
             text, score = rec_res[dno]
+            box = dt_boxes[dno]
+            coor_list = box.tolist()
             if score >= drop_score:
-                text_str = "%s, %.3f" % (text, score)
-                print(text_str)
+                temp_x = (coor_list[0][0] + coor_list[2][0])/2
+                temp_y = (coor_list[0][1]+ coor_list[2][1])/2
+                word = Word_Data(text, temp_x, temp_y)
+                words_list.append(word)
+                # text_str = "%s, %.3f" % (text, score)
+                # text_str = f"{text_str}, ({str(temp_x)}, {str(temp_y)})"
+                # print(text_str)
+        sort_text(words_list, height, width)
 
         if is_visualize:
             image = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
