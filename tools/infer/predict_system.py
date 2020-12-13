@@ -86,7 +86,7 @@ class TextSystem(object):
     def __call__(self, img):
         ori_im = img.copy()
         dt_boxes, elapse = self.text_detector(img)
-        print("dt_boxes num : {}, elapse : {}".format(len(dt_boxes), elapse))
+        logger.info("dt_boxes num : {}, elapse : {}".format(len(dt_boxes), elapse))
         if dt_boxes is None:
             return None, None
         img_crop_list = []
@@ -103,7 +103,7 @@ class TextSystem(object):
             print("cls num  : {}, elapse : {}".format(
                 len(img_crop_list), elapse))
         rec_res, elapse = self.text_recognizer(img_crop_list)
-        print("rec_res num  : {}, elapse : {}".format(len(rec_res), elapse))
+        logger.info("rec_res num  : {}, elapse : {}".format(len(rec_res), elapse))
         # self.print_draw_crop_rec_res(img_crop_list, rec_res)
         return dt_boxes, rec_res
 
@@ -146,7 +146,7 @@ def main(args):
         elapse = time.time() - starttime
         print("Predict time of %s: %.3fs" % (image_file, elapse))
 
-        drop_score = 0.5
+        drop_score = 0.0
         dt_num = len(dt_boxes)
         for dno in range(dt_num):
             text, score = rec_res[dno]
@@ -173,9 +173,41 @@ def main(args):
             cv2.imwrite(
                 os.path.join(draw_img_save, os.path.basename(image_file)),
                 draw_img[:, :, ::-1])
+            cv2.imshow("result", cv2.resize(draw_img[:, :, ::-1], (int(draw_img.shape[1]/5), int(draw_img.shape[0]/5)), interpolation = cv2.INTER_AREA))
+            while cv2.waitKey(5) < 0:
+                pass
             print("The visualized image saved in {}".format(
                 os.path.join(draw_img_save, os.path.basename(image_file))))
+        
+        return [rec_res[i][0] for i in range(len(rec_res))], dt_boxes
 
+def main_single(args):
+    text_sys = TextSystem(args)
+    starttime = time.time()
+    dt_boxes, rec_res = text_sys(args.image_dir)
+    elapse = time.time() - starttime
+    logger.info("Predict time: %.3fs" % (elapse))
+    drop_score = 0.5
+    text_box = zip(dt_boxes, rec_res)
+    new_dt_boxes = []
+    new_rec_res = []
+    for box, text in text_box:
+        if text[1] > drop_score:
+            new_dt_boxes.append(box)
+            new_rec_res.append(text[0])
+    return new_rec_res, new_dt_boxes
+
+def predict(image, det_model_dir, rec_model_dir):
+    args = utility.parse_args()
+    args.image_dir = image
+    args.det_model_dir = det_model_dir
+    args.rec_model_dir = rec_model_dir
+    args.rec_char_dict_path = 'C:/Users/Jing Chong/Documents/Github/PaddleOCR/ppocr/utils/ppocr_keys_v1.txt'
+    args.vis_font_path = 'C:/Users/Jing Chong/Documents/Github/PaddleOCR/doc/simfang.ttf'
+    args.use_gpu = False
+    args.use_space_char = True
+    args.use_angle_cls = False
+    return main_single(args)
 
 if __name__ == "__main__":
     main(utility.parse_args())

@@ -17,13 +17,32 @@ import os
 import imghdr
 import cv2
 import paddle
+import colorlog
 from paddle import fluid
 
 
 def initial_logger():
-    FORMAT = '%(asctime)s-%(levelname)s: %(message)s'
-    logging.basicConfig(level=logging.INFO, format=FORMAT)
+    log_colors = {
+        'DEBUG': 'blue',
+        'INFO': 'green',
+        'WARNING': 'yellow',
+        'ERROR': 'red',
+        'CRITICAL': 'bold_red',
+    }
+    bold_seq = '\033[1m'
+    colorlog_format = (
+        '%(asctime)s - '
+        f'{bold_seq}'
+        '%(log_color)s'
+        '%(levelname)s '
+        '%(reset)s'
+        '- %(name)s - '
+        '%(funcName)s: '
+        '%(message)s'
+    )
+    colorlog.basicConfig(log_colors=log_colors, format=colorlog_format)
     logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
     return logger
 
 

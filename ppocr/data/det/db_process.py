@@ -204,7 +204,7 @@ class DBProcessTest(object):
         try:
             if int(resize_w) <= 0 or int(resize_h) <= 0:
                 return None, (None, None)
-            im = cv2.resize(im, (int(resize_w), int(resize_h)))
+            im = cv2.resize(im, (int(resize_w), int(resize_h)), interpolation = cv2.INTER_AREA)
         except:
             print(im.shape, resize_w, resize_h)
             sys.exit(0)
@@ -235,21 +235,38 @@ class DBProcessTest(object):
         img_std = [0.229, 0.224, 0.225]
         im = im.astype(np.float32, copy=False)
         im = im / 255
+        '''
         im[:, :, 0] -= img_mean[0]
         im[:, :, 1] -= img_mean[1]
         im[:, :, 2] -= img_mean[2]
         im[:, :, 0] /= img_std[0]
         im[:, :, 1] /= img_std[1]
         im[:, :, 2] /= img_std[2]
+        cv2.imshow("normalized", im)
+        while cv2.waitKey(5) < 0:
+            pass'''
         channel_swap = (2, 0, 1)
         im = im.transpose(channel_swap)
         return im
 
     def __call__(self, im):
+        ori_im = im.copy()
+        ero_im = im.copy()
+        #ero_im = cv2.dilate(im, np.ones((3, 1), dtype=np.uint8))
+        im = ero_im
         if self.resize_type == 0:
             im, (ratio_h, ratio_w) = self.resize_image_type0(im)
         else:
             im, (ratio_h, ratio_w) = self.resize_image_type1(im)
+        '''cv2.imshow("original", cv2.resize(ori_im, (int(ori_im.shape[1]*ratio_w), int(ori_im.shape[0]*ratio_h)), interpolation = cv2.INTER_AREA))
+        while cv2.waitKey(5) < 0:
+            pass
+        cv2.imshow("erosion/dilation", cv2.resize(ero_im, (int(ero_im.shape[1]*ratio_w), int(ero_im.shape[0]*ratio_h)), interpolation = cv2.INTER_AREA))
+        while cv2.waitKey(5) < 0:
+            pass
+        cv2.imshow("resized", im)
+        while cv2.waitKey(5) < 0:
+            pass'''
         im = self.normalize(im)
         im = im[np.newaxis, :]
         return [im, (ratio_h, ratio_w)]
