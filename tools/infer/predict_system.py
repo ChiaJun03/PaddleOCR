@@ -202,6 +202,7 @@ def predict(image, det_model_dir, rec_model_dir):
     args.image_dir = image
     args.det_model_dir = det_model_dir
     args.rec_model_dir = rec_model_dir
+    # FIXME: change these paths
     args.rec_char_dict_path = 'path/to/ppocr/utils/ppocr_keys_v1.txt'
     args.vis_font_path = 'path/to/doc/simfang.ttf'
     args.use_gpu = False
