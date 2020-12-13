@@ -146,7 +146,7 @@ def main(args):
         elapse = time.time() - starttime
         print("Predict time of %s: %.3fs" % (image_file, elapse))
 
-        drop_score = 0.0
+        drop_score = 0.5
         dt_num = len(dt_boxes)
         for dno in range(dt_num):
             text, score = rec_res[dno]
@@ -202,8 +202,8 @@ def predict(image, det_model_dir, rec_model_dir):
     args.image_dir = image
     args.det_model_dir = det_model_dir
     args.rec_model_dir = rec_model_dir
-    args.rec_char_dict_path = 'C:/Users/Jing Chong/Documents/Github/PaddleOCR/ppocr/utils/ppocr_keys_v1.txt'
-    args.vis_font_path = 'C:/Users/Jing Chong/Documents/Github/PaddleOCR/doc/simfang.ttf'
+    args.rec_char_dict_path = 'path/to/ppocr/utils/ppocr_keys_v1.txt'
+    args.vis_font_path = 'path/to/doc/simfang.ttf'
     args.use_gpu = False
     args.use_space_char = True
     args.use_angle_cls = False
