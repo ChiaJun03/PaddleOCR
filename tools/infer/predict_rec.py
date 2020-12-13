@@ -72,7 +72,7 @@ class TextRecognizer(object):
             resized_w = imgW
         else:
             resized_w = int(math.ceil(imgH * ratio))
-        resized_image = cv2.resize(img, (resized_w, imgH))
+        resized_image = cv2.resize(img, (resized_w, imgH), interpolation = cv2.INTER_AREA)
         resized_image = resized_image.astype('float32')
         resized_image = resized_image.transpose((2, 0, 1)) / 255
         resized_image -= 0.5
@@ -89,13 +89,13 @@ class TextRecognizer(object):
         im_wid = img.shape[1]
 
         if im_wid <= im_hei * 1:
-            img_new = cv2.resize(img, (imgH * 1, imgH))
+            img_new = cv2.resize(img, (imgH * 1, imgH), interpolation = cv2.INTER_AREA)
         elif im_wid <= im_hei * 2:
-            img_new = cv2.resize(img, (imgH * 2, imgH))
+            img_new = cv2.resize(img, (imgH * 2, imgH), interpolation = cv2.INTER_AREA)
         elif im_wid <= im_hei * 3:
-            img_new = cv2.resize(img, (imgH * 3, imgH))
+            img_new = cv2.resize(img, (imgH * 3, imgH), interpolation = cv2.INTER_AREA)
         else:
-            img_new = cv2.resize(img, (imgW, imgH))
+            img_new = cv2.resize(img, (imgW, imgH), interpolation = cv2.INTER_AREA)
 
         img_np = np.asarray(img_new)
         img_np = cv2.cvtColor(img_np, cv2.COLOR_BGR2GRAY)
